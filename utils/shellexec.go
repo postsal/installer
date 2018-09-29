@@ -1,56 +1,88 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
-	"log"
 	"os/exec"
+	"strings"
 )
 
-func DeployK8sDashboard() {
-	command := "./deploy_dashboard.sh"
-	cmd := exec.Command("/bin/bash", "-c", command)
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
-		return
-	}
-	fmt.Printf("Execute Shell:%s finished with output:\n%s", command, string(output))
-}
-func ClearImages() {
-	command := "./clear_images.sh"
-	cmd := exec.Command("/bin/bash", "-c", command)
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
-		return
-	}
-	fmt.Printf("Execute Shell:%s finished with output:\n%s", command, string(output))
+var images = map[string]string{
+	"k8s.gcr.io/kube-proxy-amd64:v1.10.3":              "52.83.113.145:5000/k8s.gcr.io/kube-proxy-amd64:v1.10.3",
+	"k8s.gcr.io/kube-controller-manager-amd64:v1.10.3": "52.83.113.145:5000/k8s.gcr.io/kube-controller-manager-amd64:v1.10.3",
 }
 
-func LoadImages() bool {
-	command := "../deploy/curlBaidu.sh"
-	cmd := exec.Command("/bin/bash", "-c", command)
-	output, err := cmd.Output()
+func TestShellFile() {
+	command := "./deploy/load_images.sh"
+	for key, value := range images {
+		fmt.Println(key)
+		cmd := exec.Command("/bin/bash", "-c", command, key, value)
+		output, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
+			return
+		}
+		fmt.Printf("Execute Shell:%s finished with output:\n%s", command, string(output))
+	}
+}
+
+func RemoveImage(toRmImage map[string]bool) map[string]bool {
+	result := make(map[string]bool)
+	for value, bl := range toRmImage {
+		if !bl {
+			continue
+		}
+		command := "docker rmi " + value
+		str := strings.Split(command, " ")
+		cmd := exec.Command(str[0], str[1:]...)
+		_, err := cmd.Output()
+		if err != nil {
+			result[value] = false
+		} else {
+			result[value] = true
+		}
+	}
+	return result
+}
+
+func TagImage() map[string]bool {
+	result := make(map[string]bool)
+	for key, value := range images {
+		command := "docker tag " + value + " " + key
+		str := strings.Split(command, " ")
+		cmd := exec.Command(str[0], str[1:]...)
+		_, err := cmd.Output()
+		if err != nil {
+			result[value] = false
+		} else {
+			result[value] = true
+		}
+	}
+	return result
+
+}
+
+func PullImage() {
+	for key, value := range images {
+		if isImageExists(key) {
+			continue
+		}
+		command := "docker pull " + value
+		str := strings.Split(command, " ")
+		cmd := exec.Command(str[0], str[1:]...)
+		_, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
+		}
+	}
+}
+
+func isImageExists(image string) bool {
+	cmd := exec.Command("docker", "inspect", image)
+	_, err := cmd.Output()
 	if err != nil {
-		fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
 		return false
 	}
-	fmt.Printf("Execute Shell:%s finished with output:\n%s", command, string(output))
 	return true
-}
-func TestShellFile() string {
-	command := "deploy/curlBaidu.sh"
-	cmd := exec.Command("/bin/bash", "-c", command)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
-	}
-	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
-	return outStr + errStr
 }
 
 func CheckDockerExists() (bool, string) {
