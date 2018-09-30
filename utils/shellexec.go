@@ -16,7 +16,7 @@ deploy
 **/
 
 func DeployK8sDashboard() bool {
-	command := "kubectl apply -f $GOPATH/installer/deploy/kubernetes-dashboard.yaml"
+	command := "kubectl apply -f /Users/chainnova/work/go/src/installer/deploy/kubernetes-dashboard.yaml"
 	str := strings.Split(command, " ")
 	cmd := exec.Command(str[0], str[1:]...)
 	_, err := cmd.Output()
