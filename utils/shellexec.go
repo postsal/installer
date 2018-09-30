@@ -32,7 +32,7 @@ func KubeProxy() bool {
 	command := "kubectl proxy &"
 	str := strings.Split(command, " ")
 	cmd := exec.Command(str[0], str[1:]...)
-	_, err := cmd.Output()
+	err := cmd.Start()
 	if err != nil {
 		fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
 		return false
