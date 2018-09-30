@@ -16,7 +16,7 @@ deploy
 **/
 
 func DeployK8sDashboard() bool {
-	command := "kubectl apply -f /Users/chainnova/work/go/src/installer/deploy/kubernetes-dashboard.yaml"
+	command := "kubectl apply -f deploy/kubernetes-dashboard.yaml"
 	str := strings.Split(command, " ")
 	cmd := exec.Command(str[0], str[1:]...)
 	_, err := cmd.Output()
@@ -25,6 +25,18 @@ func DeployK8sDashboard() bool {
 		return false
 	} else {
 		return true
+	}
+}
+func pwd() string {
+	cmd := exec.Command("pwd")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Printf("Execute Shell:%s failed with error:%s", "pwd", err.Error())
+		return ""
+	} else {
+		pwd := string(output)
+		fmt.Printf("pwd : %s", pwd)
+		return pwd
 	}
 }
 
