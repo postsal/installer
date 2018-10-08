@@ -9,6 +9,9 @@ import (
 func init() {
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/testssh", &controllers.SingleController{}, "get:TestSSH")
+	beego.Router("/getConnect", &controllers.SSHController{}, "post:GetConnect")
+
+	//localinstall
 	beego.Router("/checkDocker", &controllers.SingleController{}, "get:CheckDockerExisted")
 	beego.Router("/pullImages", &controllers.SingleController{}, "get:PullImages")
 	beego.Router("/tagImages", &controllers.SingleController{}, "get:TagImages")

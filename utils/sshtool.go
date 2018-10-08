@@ -6,12 +6,13 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
 )
 
-func connect(user, password, host, key string, port int, cipherList []string) (*ssh.Session, error) {
+func Connect(user, password, host, key string, port int, cipherList []string) (*ssh.Session, error) {
 	var (
 		auth         []ssh.AuthMethod
 		addr         string
@@ -88,9 +89,18 @@ func connect(user, password, host, key string, port int, cipherList []string) (*
 	return session, nil
 }
 
+func SplitString(str string) (strList []string) {
+	if strings.Contains(str, ",") {
+		strList = strings.Split(str, ",")
+	} else {
+		strList = strings.Split(str, ";")
+	}
+	return
+}
+
 func SimpleSSH() {
 	var cipherList []string
-	session, err := connect("ubuntu", "", "52.83.243.19", "/Users/chainnova/.ssh/id_rsa_EBP-Dev-Env-AWS", 22, cipherList)
+	session, err := Connect("ubuntu", "", "52.83.243.19", "/Users/chainnova/.ssh/id_rsa_EBP-Dev-Env-AWS", 22, cipherList)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,5 +108,5 @@ func SimpleSSH() {
 
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
-	session.Run("/bin/bash -c curlBaidu.sh")
+	session.Run("which")
 }
