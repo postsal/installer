@@ -43,6 +43,12 @@ func CheckDockerPath() RetStruct {
 	}
 }
 
+// 查看基础镜像拉取的进度
+func GetImagesStatus() RetStruct {
+	result := utils.GetImagesStatus()
+	return GetJsonValue(STATE_SUCCESS, "get images status list", result)
+}
+
 //拉取启动kubernetes 所需的镜像，并返回成功与否的结果
 func PullImages() RetStruct {
 	result := utils.PullImages()

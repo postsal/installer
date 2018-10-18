@@ -1,13 +1,25 @@
 #/bin/bash
-docker inspect $1 &> /dev/null
-if [[ $? == 0 ]]; then
-    echo "$1 existed"
-    continue
+file="deploy/images"
+
+if [ -f "$file" ]
+then
+  echo "$file found."
+
+  while IFS='=' read -r key value
+  do
+    echo "${key}=${value}"
+    docker inspect ${key} &> /dev/null
+    if [[ $? == 0 ]]; then
+        echo "${key} existed"
+        continue
+    else
+        echo "${key} not existed"
+        docker pull ${value}
+        docker tag ${value} ${key}
+        docker rmi ${value}
+    fi
+  done < "$file"
+
 else
-    echo "$1 not existed"
-    docker pull $2
-    docker tag  $2 $1
-    docker rmi $2
+  echo "$file not found."
 fi
-
-

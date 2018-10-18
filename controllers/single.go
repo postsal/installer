@@ -38,6 +38,12 @@ func (c *SingleController) CheckDockerExisted() {
 	c.ServeJSON()
 }
 
+func (c *SingleController) GetImagesStatus() {
+	info := models.GetImagesStatus()
+	c.Data["json"] = info
+	c.ServeJSON()
+}
+
 func (c *SingleController) PullImages() {
 	info := models.PullImages()
 	c.Data["json"] = info
@@ -55,8 +61,8 @@ func (c *SingleController) RemoveImages() {
 	c.ServeJSON()
 }
 
-func (c *SingleController) TestSSH() {
-	utils.SimpleSSH()
-	c.Data["json"] = "test SSH"
+func (c *SingleController) Test() {
+	utils.ExecSH()
+	c.Data["json"] = "test"
 	c.ServeJSON()
 }

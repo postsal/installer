@@ -9,6 +9,41 @@ import (
 var images = map[string]string{
 	"k8s.gcr.io/kube-proxy-amd64:v1.10.3":              "52.83.113.145:5000/k8s.gcr.io/kube-proxy-amd64:v1.10.3",
 	"k8s.gcr.io/kube-controller-manager-amd64:v1.10.3": "52.83.113.145:5000/k8s.gcr.io/kube-controller-manager-amd64:v1.10.3",
+	"k8s.gcr.io/kube-scheduler-amd64:v1.10.3":          "52.83.113.145:5000/k8s.gcr.io/kube-scheduler-amd64:v1.10.3",
+	"k8s.gcr.io/kube-apiserver-amd64:v1.10.3":          "52.83.113.145:5000/k8s.gcr.io/kube-apiserver-amd64:v1.10.3",
+	"k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.8":    "52.83.113.145:5000/k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.8",
+	"k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.5":    "52.83.113.145:5000/k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64:1.14.5",
+	"k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.8":          "52.83.113.145:5000/k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.8",
+	"k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.5":          "52.83.113.145:5000/k8s.gcr.io/k8s-dns-sidecar-amd64:1.14.5",
+	"k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.8":         "52.83.113.145:5000/k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.8",
+	"k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.5":         "52.83.113.145:5000/k8s.gcr.io/k8s-dns-kube-dns-amd64:1.14.5",
+	"k8s.gcr.io/pause-amd64:3.1":                       "52.83.113.145:5000/k8s.gcr.io/pause-amd64:3.1",
+	"k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0":    "52.83.113.145:5000/k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.0",
+	"k8s.gcr.io/etcd-amd64:3.1.12":                     "52.83.113.145:5000/k8s.gcr.io/etcd-amd64:3.1.12",
+}
+
+func Pwd() string {
+	cmd := exec.Command("pwd")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Printf("Execute Shell:%s failed with error:%s", "pwd", err.Error())
+		return ""
+	} else {
+		pwd := string(output)
+		fmt.Printf("pwd : %s", pwd)
+		return pwd
+	}
+}
+
+func ExecSH() {
+	command := "deploy/load_images.sh"
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Printf("Execute Shell:%s failed with error:%s", command, err.Error())
+		return
+	}
+	fmt.Printf("Execute Shell:%s finished with output:\n%s", command, string(output))
 }
 
 /**
@@ -25,18 +60,6 @@ func DeployK8sDashboard() bool {
 		return false
 	} else {
 		return true
-	}
-}
-func pwd() string {
-	cmd := exec.Command("pwd")
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("Execute Shell:%s failed with error:%s", "pwd", err.Error())
-		return ""
-	} else {
-		pwd := string(output)
-		fmt.Printf("pwd : %s", pwd)
-		return pwd
 	}
 }
 
@@ -127,6 +150,18 @@ func PullImages() map[string]bool {
 			result[value] = false
 		} else {
 			result[value] = true
+		}
+	}
+	return result
+}
+
+func GetImagesStatus() map[string]bool {
+	result := make(map[string]bool)
+	for k, _ := range images {
+		if isImageExists(k) {
+			result[k] = true
+		} else {
+			result[k] = false
 		}
 	}
 	return result

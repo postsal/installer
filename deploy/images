@@ -1,2 +1,1 @@
-k8s.gcr.io/kube-proxy-amd64:v1.10.3=registry.cn-hangzhou.aliyuncs.com/google_containers/kube-proxy-amd64:v1.10.3
-
+k8s.gcr.io/kube-proxy-amd64:v1.10.3=52.83.113.145:5000/k8s.gcr.io/kube-proxy-amd64:v1.10.3
